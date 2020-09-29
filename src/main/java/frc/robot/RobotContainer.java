@@ -8,9 +8,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.commands.SwerveDriveCommand;
+import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -21,19 +22,34 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  public static final DriveSubsystem m_DriveSubsystem = DriveSubsystem.getInstance();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  private final SwerveDriveCommand m_autoCommand = new SwerveDriveCommand(m_DriveSubsystem);
 
+  private static RobotContainer _instance;
+
+  private static Joystick leftDriverJoystick, rightDriverJoystick;
 
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    
+
     // Configure the button bindings
     configureButtonBindings();
+
+    m_DriveSubsystem.setDefaultCommand(m_autoCommand);
   }
+
+  public static RobotContainer getInstance(){
+    if(_instance == null){
+      _instance = new RobotContainer();
+    }
+    return _instance;
+  }
+
 
   /**
    * Use this method to define your button->command mappings.  Buttons can be created by
@@ -42,6 +58,24 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    leftDriverJoystick = new Joystick(0);
+    rightDriverJoystick = new Joystick(1);
+  }
+
+  public double getRightDriverJoystickX(){
+    return rightDriverJoystick.getRawAxis(0); //lmao have to change this and im too lazy
+  }
+
+  public double getRightDriverJoystickY(){
+    return rightDriverJoystick.getRawAxis(1); //lmao have to change this and im too lazy
+  }
+
+  public double getLeftDriverJoystickX(){
+    return leftDriverJoystick.getRawAxis(0); //lmao have to change this and im too lazy
+  }
+
+  public double getLeftDriverJoystickY(){
+    return leftDriverJoystick.getRawAxis(1); //lmao have to change this and im too lazy
   }
 
 
