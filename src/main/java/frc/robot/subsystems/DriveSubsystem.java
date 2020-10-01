@@ -7,26 +7,18 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.PIDBase;
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.lib.SwerveDrive;
+import frc.robot.lib.WheelModule;
 
 public class DriveSubsystem extends SubsystemBase {
 
   public static DriveSubsystem _instance;
-
-
-  private final int L = 0; // length and width between wheel axles
-  private final int W = 0;
-
-  private final double MAX_VOLTS = 4.45;
 
   public CANSparkMax frontRightAngleMotor;
   public CANSparkMax backRightAngleMotor;
@@ -42,6 +34,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   public CANEncoder frontLeftAngleEncoder, frontRightAngleEncoder, backLeftAngleEncoder, backRightAngleEncoder;
 
+  private WheelModule frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel;
+
+  private SwerveDrive swerveDrive;
 
   /**
    * Creates a new DriveSubsystem.
@@ -77,8 +72,20 @@ public class DriveSubsystem extends SubsystemBase {
     backRightAnglePID.setFeedbackDevice(backRightAngleEncoder);
     backRightAnglePID.setOutputRange(-1, 1);
 
+    frontLeftWheel = new WheelModule(frontLeftAnglePID, frontLeftSpeedMotor);
+    frontRightWheel = new WheelModule(frontRightAnglePID, frontRightSpeedMotor);
+    backLeftWheel = new WheelModule(backLeftAnglePID, backLeftSpeedMotor);
+    backRightWheel = new WheelModule(backRightAnglePID, backRightSpeedMotor);
+
+    swerveDrive = new SwerveDrive(frontRightWheel, frontLeftWheel, backLeftWheel, backRightWheel);
+
   }
 
+  /**
+   * Returns instance of DriveSubsystem, if none exists, creates and returns instance
+   * 
+   * @return - instance of DriveSubsystem
+   */
   public static DriveSubsystem getInstance(){
     if(_instance == null){
       _instance = new DriveSubsystem();
@@ -89,51 +96,15 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
-    
-
   }
 
+  /**
+   * Called by commands to control swerve drive with 3 axis
+   * @param x1 - left joystick x axis (control left/right)
+   * @param y1 - left joystick y axis (control forward/back)
+   * @param x2 - right joystick x axis or turn axis (control rotation)
+   */
   public void swerveDrive (double x1, double y1, double x2) {
-    double r = Math.sqrt ((L * L) + (W * W));
-    y1 *= -1;
-
-    double a = x1 - x2 * (L / r);
-    double b = x1 + x2 * (L / r);
-    double c = y1 - x2 * (W / r);
-    double d = y1 + x2 * (W / r);
-
-    double backRightSpeed = Math.sqrt ((a * a) + (d * d));
-    double backLeftSpeed = Math.sqrt ((a * a) + (c * c));
-    double frontRightSpeed = Math.sqrt ((b * b) + (d * d));
-    double frontLeftSpeed = Math.sqrt ((b * b) + (c * c));
-
-    double backRightAngle = Math.atan2 (a, d) / Math.PI;
-    double backLeftAngle = Math.atan2(a, c) / Math.PI;
-    double frontRightAngle = Math.atan2(b, d) / Math.PI;
-    double frontLeftAngle = Math.atan2(b, c) / Math.PI;
-
-    driveWheel(backRightSpeedMotor, backRightAnglePID, backRightSpeed, backRightAngle);
-    driveWheel(backLeftSpeedMotor, backLeftAnglePID, backLeftSpeed, backLeftAngle);
-    driveWheel(frontRightSpeedMotor, frontRightAnglePID, frontRightSpeed, frontRightAngle);
-    driveWheel(frontLeftSpeedMotor, frontLeftAnglePID, frontLeftSpeed, frontLeftAngle);
-  }
-
-  private void applyPID(CANPIDController controller, double setpoint){
-    controller.setReference(setpoint, ControlType.kPosition);
-  }
-
-  private void driveWheel(CANSparkMax speedMotor, CANPIDController angleMotorPID, double speed, double angle){
-    speedMotor.set (speed);
-
-    double setpoint = angle * (MAX_VOLTS * 0.5) + (MAX_VOLTS * 0.5); // Optimization offset can be calculated here.
-    if (setpoint < 0) {
-        setpoint = MAX_VOLTS + setpoint;
-    }
-    if (setpoint > MAX_VOLTS) {
-        setpoint = setpoint - MAX_VOLTS;
-    }
-
-    applyPID(angleMotorPID, setpoint);
+    swerveDrive.drive(x1, y1, x2);
   }
 }

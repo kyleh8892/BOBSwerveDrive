@@ -7,26 +7,25 @@
 
 package frc.robot.commands;
 
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
- * An SwerveDrive command that uses an SwerveDrive subsystem.
+ * A SwerveDrive command that uses a drive subsystem.
  */
-public class SwerveDriveCommand extends CommandBase {
+public class SwerveDriveJoystick extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final DriveSubsystem m_subsystem;
 
+  private final DriveSubsystem drive;
 
   /**
-   * Creates a new SwerveDriveCommand.
+   * Creates a new SwerveDriveJoystic command.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param subsystem - The subsystem used by this command (drive).
    */
-  public SwerveDriveCommand(DriveSubsystem subsystem) {
-    m_subsystem = subsystem;
+  public SwerveDriveJoystick(DriveSubsystem subsystem) {
+    drive = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -39,7 +38,7 @@ public class SwerveDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.swerveDrive(RobotContainer.getInstance().getLeftDriverJoystickX(), RobotContainer.getInstance().getLeftDriverJoystickY(), RobotContainer.getInstance().getRightDriverJoystickX());
+    drive.swerveDrive(RobotContainer.getInstance().getLeftDriverJoystickX(), RobotContainer.getInstance().getLeftDriverJoystickY(), RobotContainer.getInstance().getRightDriverJoystickX());
   }
 
   // Called once the command ends or is interrupted.

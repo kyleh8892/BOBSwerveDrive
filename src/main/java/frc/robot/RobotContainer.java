@@ -7,10 +7,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.SwerveDriveCommand;
+import frc.robot.commands.SwerveDriveJoystick;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -22,9 +20,9 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  public static final DriveSubsystem m_DriveSubsystem = DriveSubsystem.getInstance();
+  public static final DriveSubsystem drive = DriveSubsystem.getInstance();
 
-  private final SwerveDriveCommand m_autoCommand = new SwerveDriveCommand(m_DriveSubsystem);
+  private final SwerveDriveJoystick swerveDriveJoystick = new SwerveDriveJoystick(drive);
 
   private static RobotContainer _instance;
 
@@ -40,7 +38,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    m_DriveSubsystem.setDefaultCommand(m_autoCommand);
+    drive.setDefaultCommand(swerveDriveJoystick);
   }
 
   public static RobotContainer getInstance(){
@@ -52,10 +50,7 @@ public class RobotContainer {
 
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * Use this method to define your button->command mappings.
    */
   private void configureButtonBindings() {
     leftDriverJoystick = new Joystick(0);
@@ -86,6 +81,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return null;
   }
 }
